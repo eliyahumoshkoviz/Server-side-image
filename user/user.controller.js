@@ -1,8 +1,14 @@
 const { userModel } = require("./usre.modle");
 
+
 async function create(data) {
-    return await userModel.create(data);
+    return data?.isActive === false
+        ? (await update({ email: data.email }, { isActive: true })).modifiedCount > 0
+            ? await readUserWithPassword({ _id: data._id })
+            : Promise.reject(new Error("Update failed"))
+        : await userModel.create(data);
 }
+
 
 async function read(object = {}) {
     return await userModel.find({ ...object, isActive: true });
@@ -11,6 +17,7 @@ async function read(object = {}) {
 async function readOne(object = {}) {
     return await userModel.findOne(object);
 }
+
 async function readUserWithPassword(object = {}) {
     return await userModel.findOne(object).select("+password");
 }

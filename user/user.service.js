@@ -14,13 +14,14 @@ async function addNewUser(data) {
     // check if email exist
     let user = await userController.readOne({ email: data.email });
     // if exist and user active throw code 400
-    // if user not active throw code 450 לטפל שזה יהיה רישום מחדש ע"י עדכון השדה שהוא פעיל
-    if (user)
-        throw { code: user.isActive ? 400 : 450, message: "user is exist" };
+    if (user && user.isActive)
+        throw { code: 400, message: "user is exist" };
 
     // check object (by schema)
     if (await valid.handleValidation(data)) {
-        return await userController.create(data);
+        return user && !user.isActive
+            ? await userController.create(user)
+            : await userController.create(data);
     }
 }
 
@@ -44,7 +45,7 @@ async function del(data) {
             message: "input error - the password does not match the email",
         };
     }
-    return await userController.del({id: data._id});
+    return await userController.del({ _id: user.id });
 }
 
 module.exports = { addNewUser, del };
