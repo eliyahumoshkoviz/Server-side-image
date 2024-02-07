@@ -10,6 +10,9 @@ app.use(express.json());
 require("./db/db.connect").connect();
 
 const userRouter = require("./user/user.router");
+const LogRouter = require("./login/login.router");
+
 app.use("/user", userRouter);
+app.use("/login", LogRouter);
 
 app.listen(8000, () => console.log("### Server is up ###"));
