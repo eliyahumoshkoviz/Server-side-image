@@ -2,8 +2,9 @@ const express = require("express"),
     router = express.Router();
 
 const userService = require("./user.service");
+const { authenticate } = require("../middleware/autu")
 
-router.post("/", async (req, res) => {
+router.post("/", authenticate, async (req, res) => {
     try {
         let result = await userService.addNewUser(req.body);
         res.send(
@@ -18,7 +19,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.delete("/", async (req, res) => {
+router.delete("/", authenticate, async (req, res) => {
     try {
         let result = await userService.del(req.body);
         res.status(result.modifiedCount > 0 ? 200 : 400).send(

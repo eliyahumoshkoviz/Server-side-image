@@ -5,7 +5,15 @@ const handleValidation = async (data) => {
         Object.keys(data).includes(field)
     );
 
-    if (!isValid || requiredFields.length !== Object.keys(data).length) {
+    //When registering, only 4 fields are required,
+    //but when connecting, additional fields are added
+    //by the token
+
+    const isPermission = Object.keys(data).includes("permission");
+    const flag = requiredFields.length === Object.keys(data).length 
+    || isPermission && requiredFields.length + 1 === Object.keys(data).length;
+
+    if (!isValid || !flag) {
         throw new Error("Invalid user data Fields do not match the schema.");
     }
 
