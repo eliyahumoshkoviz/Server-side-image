@@ -25,25 +25,65 @@ async function addNewUser(data) {
     }
 }
 
-async function GetUserInformation({email}) {
+async function GetUserInfo(data) {
 
-    // Makes sure the email fields exist
-    if (!email) {
+    // Makes sure the data exist
+    if (!data) {
         throw {
             code: 400,
             message:
-                "input error - missing email",
+                "input error - missing data",
         };
     }
-    
-    // check if email exist or user exist but not active
-    let user = await userController.readOne({ email: email });
+
+    // check if user exist or user exist but not active
+    let user = await userController.readOne(data);
     // if not exist or not active throw code 400
     if (!user || !user.isActive) {
         throw { code: 400, message: "user isn't exist" };
     }
 
     return user;
+}
+
+async function updateFieldById(id, data) {
+
+    // Makes sure the id and data exist
+    if (!id || !data) {
+        throw {
+            code: 400,
+            message:
+                "input error - missing id or data",
+        };
+    }
+
+    //Make sure the user changes only this field
+    const modifiableFields = ["fName", "lName", "email", "password"];
+    const field = modifiableFields.find((field) =>
+        Object.keys(data).includes(field));
+
+    if (!field) {
+        throw {
+            code: 400,
+            message:
+                "input error - you can't change this field",
+        };
+    }
+ 
+    // check if user exist or user exist but not active
+    let user = await userController.readOne(id);
+    // if not exist or not active throw code 400
+    if (!user || !user.isActive) {
+        throw { code: 400, message: "user isn't exist" };
+    }
+  
+    // check object (by schema)
+    if (!await valid.validateSingleField(field, data[field])) {
+        throw { code: 400, message: "invalid fields" };
+    }
+
+    return await userController.updateById(id, data)
+
 }
 
 async function del(data) {
@@ -69,4 +109,4 @@ async function del(data) {
     return await userController.del({ _id: user.id });
 }
 
-module.exports = { addNewUser, del, GetUserInformation };
+module.exports = { addNewUser, del, GetUserInfo, updateFieldById };

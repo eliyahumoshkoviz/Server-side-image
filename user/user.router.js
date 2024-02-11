@@ -21,7 +21,7 @@ router.post("/", authenticate, async (req, res) => {
 
 router.get("/", authenticate, async (req, res) => {
     try {
-        let result = await userService.GetUserInformation({email: req.body.email});
+        let result = await userService.GetUserInfo({ email: req.body.email });
         res.send(
             {
                 deletedUser: result
@@ -31,6 +31,24 @@ router.get("/", authenticate, async (req, res) => {
         res.status(err?.code ?? 400).send(err.message);
     }
 });
+
+router.patch("/", authenticate, async (req, res) => {
+    try {
+        const result = await userService.GetUserInfo({ email: req.body.email });
+        const updated = await userService.updateFieldById(result._id, req.body.data);
+
+        res.send(
+            {
+                success: updated.modifiedCount > 0,
+                message: updated.modifiedCount > 0 ? "User updated successfully." : "User not updated",
+                deletedUser: updated.modifiedCount > 0 ? await userService.GetUserInfo({ email: req.body.email }) : null
+            }
+        );
+    } catch (err) {
+        res.status(err?.code ?? 400).send(err.message);
+    }
+});
+
 
 router.delete("/", authenticate, async (req, res) => {
     try {

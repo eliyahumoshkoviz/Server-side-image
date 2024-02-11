@@ -10,8 +10,8 @@ const handleValidation = async (data) => {
     //by the token
 
     const isPermission = Object.keys(data).includes("permission");
-    const flag = requiredFields.length === Object.keys(data).length 
-    || isPermission && requiredFields.length + 1 === Object.keys(data).length;
+    const flag = requiredFields.length === Object.keys(data).length
+        || isPermission && requiredFields.length + 1 === Object.keys(data).length;
 
     if (!isValid || !flag) {
         throw new Error("Invalid user data Fields do not match the schema.");
@@ -27,6 +27,20 @@ const handleValidation = async (data) => {
 
     return true;
 };
+
+const validateSingleField = async (field, value) => {
+    if (field === "email") {
+        return validEmail(value);
+    }
+    if (field === "password") {
+        return validPassword(value);
+    }
+    return true;
+
+}
+
+module.exports = { handleValidation, validateSingleField };
+
 
 const validEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,8 +69,6 @@ function validPassword(password) {
 
     return true;
 }
-
-module.exports = { handleValidation };
 
 function hasDigit(str) {
     return /\d/.test(str);
