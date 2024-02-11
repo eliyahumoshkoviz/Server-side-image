@@ -19,6 +19,19 @@ router.post("/", authenticate, async (req, res) => {
     }
 });
 
+router.get("/", authenticate, async (req, res) => {
+    try {
+        let result = await userService.GetUserInformation({email: req.body.email});
+        res.send(
+            {
+                deletedUser: result
+            }
+        );
+    } catch (err) {
+        res.status(err?.code ?? 400).send(err.message);
+    }
+});
+
 router.delete("/", authenticate, async (req, res) => {
     try {
         let result = await userService.del(req.body);

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 require("./item.modle");
-require("./user/usre.modle");
+require("../user/usre.modle");
 
 const orderSchema = new mongoose.Schema({
     userId: {
