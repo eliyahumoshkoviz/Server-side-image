@@ -6,13 +6,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-//יוצר חיבור למאגר נתונים
+//make connect to database
 require("./db/db.connect").connect();
 
 const userRouter = require("./user/user.router");
 const LogRouter = require("./login/login.router");
+const registrationRouter = require("./registration/registration.router");
 
-app.use("/user", userRouter);
+app.use("/registration", registrationRouter);
 app.use("/login", LogRouter);
+app.use("/user", userRouter);
 
 app.listen(8000, () => console.log("### Server is up ###"));

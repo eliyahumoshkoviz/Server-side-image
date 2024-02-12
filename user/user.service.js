@@ -57,7 +57,7 @@ async function updateFieldById(id, data) {
         };
     }
 
-    //Make sure the user changes only this field
+    //Make sure the user changes only this field (Only one of these fields can change)
     const modifiableFields = ["fName", "lName", "email", "password"];
     const field = modifiableFields.find((field) =>
         Object.keys(data).includes(field));
@@ -87,6 +87,7 @@ async function updateFieldById(id, data) {
 }
 
 async function del(data) {
+
     // Makes sure the data is not empty and then checks if the required fields exist
     if (!data?.email || !data?.password) {
         throw {

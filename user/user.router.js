@@ -2,7 +2,7 @@ const express = require("express"),
     router = express.Router();
 
 const userService = require("./user.service");
-const { authenticate } = require("../middleware/autu")
+const { authenticate, checkPermission } = require("../middleware/autu");
 
 router.post("/", authenticate, async (req, res) => {
     try {
@@ -32,9 +32,10 @@ router.get("/", authenticate, async (req, res) => {
     }
 });
 
-router.patch("/", authenticate, async (req, res) => {
+router.patch("/", authenticate, checkPermission, async (req, res) => {
     try {
-        const result = await userService.GetUserInfo({ email: req.body.email });
+        const email = req.body.auth.permission === "user" ? req.body.auth.email : req.body.email;
+        const result = await userService.GetUserInfo({ email: email });
         const updated = await userService.updateFieldById(result._id, req.body.data);
 
         res.send(
@@ -50,14 +51,18 @@ router.patch("/", authenticate, async (req, res) => {
 });
 
 
-router.delete("/", authenticate, async (req, res) => {
+router.delete("/", authenticate, checkPermission, async (req, res) => {
     try {
+
+        let user = await userService.GetUserInfo({ email: req.body.email });
         let result = await userService.del(req.body);
+        user.isActive = false;
+
         res.status(result.modifiedCount > 0 ? 200 : 400).send(
             {
                 success: result.modifiedCount > 0,
                 message: result.modifiedCount > 0 ? "User deleted successfully." : "User not found",
-                deletedUser: result.modifiedCount > 0 ? req.body : null
+                deletedUser: result.modifiedCount > 0 ? user : null
             }
         );
 

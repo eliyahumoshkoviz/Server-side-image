@@ -2,8 +2,12 @@ const { userModel } = require("./usre.modle");
 
 
 async function create(data) {
+    //If a user exists but is not active, updates that it is active,
+    //if not, creates a new user
     return data?.isActive === false
         ? (await update({ email: data.email }, { isActive: true })).modifiedCount > 0
+            //If successful, the function will return the user's information
+            // if it does not throw an error
             ? await readUserWithPassword({ _id: data._id })
             : Promise.reject(new Error("Update failed"))
         : await userModel.create(data);

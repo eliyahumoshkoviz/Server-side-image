@@ -1,4 +1,4 @@
-const loginController = require("./login.controller");
+const userController = require("../user/user.controller");
 const { createToken } = require("../middleware/autu")
 
 
@@ -14,7 +14,7 @@ async function isUserExists({email,password}) {
     }
 
     // check if email exist or user exist but not active
-    let user = await loginController.readUserWithPassword({ email: email });
+    let user = await userController.readUserWithPassword({ email: email });
     // if not exist or not active throw code 400
     if (!user || !user.isActive) {
         throw { code: 400, message: "user isn't exist" };
@@ -28,7 +28,7 @@ async function isUserExists({email,password}) {
         };
     }
 
-    return { token: createToken({ name: user.fName, permission: user.permission }) }
+    return { token: createToken({ email: user.email, permission: user.permission }) }
 
 }
 
